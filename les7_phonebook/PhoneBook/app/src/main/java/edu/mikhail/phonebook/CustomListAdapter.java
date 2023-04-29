@@ -7,19 +7,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
-public class CustomListAdapter extends ArrayAdapter<String> {
+public class CustomListAdapter extends ArrayAdapter<User> {
     private final Context context;
-    private final String[] values;
+    private final User[] values;
 
-    public CustomListAdapter(Context _context, String[] ids, String[] data)
+    public CustomListAdapter(Context _context, User[] users)
     {
-        super(_context, R.layout.row_layout, ids);
+        super(_context, R.layout.row_layout, users);
         context = _context;
-        values = data;
+        values = users;
     }
 
     @Override
@@ -28,23 +30,46 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         TextView rowData_name;
         TextView rowData_number;
         TextView rowData_group;
+        ImageView img;
         View v;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         v = inflater.inflate(R.layout.item_layout, parent, false);
+
         rowData_number = v.findViewById(R.id.row_phone);
         rowData_name = v.findViewById(R.id.row_name);
         rowData_group = v.findViewById(R.id.row_group);
+        img = v.findViewById(R.id.contact_image);
 
-        pos *= 3;
+        rowData_name.setText(values[pos].getUserName() + " " + values[pos].getForname());
+        rowData_number.setText(values[pos].getNumber());
 
-            if (pos >= values.length || pos+1 >= values.length || pos+2 >= values.length)
-            {
-                Log.d("Error", "i >= value_length");
-                return v;
+        if (values[pos].getClass() == Developer.class)
+        {
+            img.setImageResource(R.drawable.developer);
+            rowData_group.setText("developer");
+        }
+        else if (values[pos].getClass() == Manager.class)
+        {
+            img.setImageResource(R.drawable.manager);
+            rowData_group.setText("manager");
+        }
+        else
+        {
+            img.setImageResource(R.drawable.unknown);
+            rowData_group.setText("UNKNOWN");
+        }
+
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Item clicked: " +
+                        rowData_name.getText() +
+                        " with number " +
+                        rowData_number.getText() +
+                        " from group " +
+                        rowData_group.getText(), Toast.LENGTH_SHORT).show();
             }
-            rowData_name.setText(values[pos]);
-            rowData_number.setText(values[pos+1]);
-            rowData_group.setText(values[pos+2]);
+        });
 
         return v;
     }
